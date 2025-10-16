@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php'; // Connect to the database
+require_once 'src/includes/db.php'; // Connect to the database
 
 // --- Security Check ---
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {

@@ -1,7 +1,7 @@
 
 <?php
 // index.php - FINAL & COMPLETE version rewritten for MySQL Database
-require_once 'db.php';
+require_once 'src/includes/db.php';
 
 // --- Helper Functions ---
 function get_all_settings($pdo) {

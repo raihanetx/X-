@@ -1,19 +1,11 @@
 <?php
 session_start();
 
-// --- Configuration ---
-$config_file_path = 'config.json';
-if (!file_exists($config_file_path)) {
-    // Create a default config if it doesn't exist. The password will be 'password123'
-    $hashed_password = password_hash('password123', PASSWORD_DEFAULT);
-    $default_config = [
-        "admin_password" => $hashed_password
-        // other default settings can go here
-    ];
-    file_put_contents($config_file_path, json_encode($default_config, JSON_PRETTY_PRINT));
-}
-$config = json_decode(file_get_contents($config_file_path), true);
-$ADMIN_PASSWORD_HASH = $config['admin_password'] ?? '$2y$10$abcdefghijklmnopqrstuv'; // A dummy hash
+require_once 'src/includes/db.php';
+require_once 'src/includes/helpers.php';
+
+$site_config = get_all_settings($pdo);
+$ADMIN_PASSWORD_HASH = $site_config['admin_password'] ?? password_hash('password123', PASSWORD_DEFAULT);
 
 $error_message = '';
 
@@ -25,25 +17,9 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $password_is_correct = false;
     $submitted_password = $_POST['password'] ?? '';
-    $stored_password_value = $config['admin_password'] ?? '';
 
-    // 1. Check if the stored password is a valid hash and verify against it
-    if (password_verify($submitted_password, $stored_password_value)) {
-        $password_is_correct = true;
-    }
-    // 2. Legacy check for plaintext password from config.
-    else if (!empty($submitted_password) && $submitted_password === $stored_password_value) {
-        $password_is_correct = true;
-        // --- Security Upgrade ---
-        // Upgrade the plaintext password to a secure hash.
-        $config['admin_password'] = password_hash($submitted_password, PASSWORD_DEFAULT);
-        // Save the updated config with the new hash.
-        file_put_contents($config_file_path, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-    }
-
-    if ($password_is_correct) {
+    if (password_verify($submitted_password, $ADMIN_PASSWORD_HASH)) {
         // Password is correct, set session variable and regenerate session ID
         session_regenerate_id(true);
         $_SESSION['loggedin'] = true;
