@@ -243,6 +243,7 @@ $current_view = $_GET['view'] ?? 'dashboard';
                         <a href="admin.php?view=hotdeals" class="tab flex-shrink-0 <?= $current_view === 'hotdeals' ? 'tab-active' : '' ?>"><i class="fa-solid fa-fire mr-2"></i>Hot Deals</a>
                         <a href="admin.php?view=orders" class="tab flex-shrink-0 <?= $current_view === 'orders' ? 'tab-active' : '' ?>"><i class="fa-solid fa-bag-shopping mr-2"></i>Orders <?php if ($pending_orders_count > 0): ?><span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full px-2 py-0.5"><?= $pending_orders_count ?></span><?php endif; ?></a>
                         <a href="admin.php?view=reviews" class="tab flex-shrink-0 <?= $current_view === 'reviews' ? 'tab-active' : '' ?>"><i class="fa-solid fa-star mr-2"></i>Reviews <span class="ml-2 bg-purple-100 text-purple-700 text-xs font-bold rounded-full px-2 py-0.5"><?= count($all_reviews) ?></span></a>
+                        <a href="admin.php?view=pages" class="tab flex-shrink-0 <?= $current_view === 'pages' ? 'tab-active' : '' ?>"><i class="fa-solid fa-file-lines mr-2"></i>Pages</a>
                         <a href="admin.php?view=settings" class="tab flex-shrink-0 <?= $current_view === 'settings' ? 'tab-active' : '' ?>"><i class="fa-solid fa-gear mr-2"></i>Settings</a>
                     </nav>
                 </div>
@@ -427,6 +428,41 @@ $current_view = $_GET['view'] ?? 'dashboard';
                 </div>
                 <!-- Review Management View -->
                 <div id="view-reviews" style="<?= $current_view === 'reviews' ? '' : 'display:none;' ?>" class="p-6"><h2 class="text-xl font-bold text-gray-700 mb-4">Manage All Reviews</h2><?php if(empty($all_reviews)): ?><p class="text-gray-500 text-center py-10">There are no reviews on the website yet.</p><?php else: ?><div class="space-y-4"><?php foreach($all_reviews as $review): ?><div class="bg-gray-50 border rounded-lg p-4 flex flex-col md:flex-row gap-4 justify-between items-start"><div class="flex-grow"><p class="font-semibold text-gray-800"><?= htmlspecialchars($review['name']) ?> <span class="text-yellow-500 ml-2"><?= str_repeat('★', $review['rating']) . str_repeat('☆', 5 - $review['rating']) ?></span></p><p class="text-sm text-gray-500">For: <strong><?= htmlspecialchars($review['product_name']) ?></strong></p><p class="mt-2 text-gray-700">"<?= nl2br(htmlspecialchars($review['comment'])) ?>"</p></div><div class="flex-shrink-0 flex items-center gap-2 mt-2 md:mt-0"><form action="api.php" method="POST" onsubmit="return confirm('Are you sure?');"><input type="hidden" name="action" value="update_review_status"><input type="hidden" name="product_id" value="<?= $review['product_id'] ?>"><input type="hidden" name="review_id" value="<?= $review['id'] ?>"><input type="hidden" name="new_status" value="deleted"><button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> Delete</button></form></div></div><?php endforeach; ?></div><?php endif; ?></div>
+
+                <!-- Pages View -->
+                <div id="view-pages" style="<?= $current_view === 'pages' ? '' : 'display:none;' ?>" class="p-6">
+                    <form action="api.php" method="POST" class="space-y-8">
+                        <input type="hidden" name="action" value="update_page_content">
+                        <h2 class="text-xl font-bold text-gray-700 mb-4">Manage Page Content</h2>
+
+                        <?php
+                        $pages_to_manage = [
+                            'about_us' => 'About Us',
+                            'terms' => 'Terms and Conditions',
+                            'privacy' => 'Privacy Policy',
+                            'refund' => 'Refund Policy'
+                        ];
+
+                        foreach ($pages_to_manage as $key => $title):
+                            $db_key = "page_content_{$key}";
+                            $content = $site_config[$db_key] ?? '';
+                        ?>
+                        <div class="bg-white p-6 rounded-lg border">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-800"><?= htmlspecialchars($title) ?></h3>
+                            <div>
+                                <label class="block mb-1.5 font-medium text-gray-700 text-sm">Page Content</label>
+                                <textarea name="page_content[<?= $key ?>]" class="form-textarea" rows="10" placeholder="Enter content for the <?= htmlspecialchars($title) ?> page."><?= htmlspecialchars($content) ?></textarea>
+                                <p class="text-xs text-gray-500 mt-1">Use *text* to make text bold. All line breaks and spacing will be preserved.</p>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+
+                        <div>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save All Pages</button>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Settings View -->
                 <div id="view-settings" style="<?= $current_view === 'settings' ? '' : 'display:none;' ?>" class="p-6 space-y-8 max-w-5xl mx-auto">
                     <!-- Site Identity -->
