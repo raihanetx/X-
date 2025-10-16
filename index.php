@@ -1048,7 +1048,7 @@ if ($request_path) {
                     }
                     // Sanitize and format
                     const escaped = content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    const bolded = escaped.replace(/\*(.*?)\*/g, '<b>$1</b>');
+                    const bolded = escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                     const lineBreaks = bolded.replace(/\n/g, '<br>');
                     return `<div style="white-space: pre-wrap; font-family: inherit; word-wrap: break-word;">${lineBreaks}</div>`;
                 },

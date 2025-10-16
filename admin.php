@@ -452,7 +452,7 @@ $current_view = $_GET['view'] ?? 'dashboard';
                             <div>
                                 <label class="block mb-1.5 font-medium text-gray-700 text-sm">Page Content</label>
                                 <textarea name="page_content[<?= $key ?>]" class="form-textarea" rows="10" placeholder="Enter content for the <?= htmlspecialchars($title) ?> page."><?= htmlspecialchars($content) ?></textarea>
-                                <p class="text-xs text-gray-500 mt-1">Use *text* to make text bold. All line breaks and spacing will be preserved.</p>
+                                <p class="text-xs text-gray-500 mt-1">Use **text** to make text bold. All line breaks and spacing will be preserved.</p>
                             </div>
                         </div>
                         <?php endforeach; ?>
