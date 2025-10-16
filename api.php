@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (!$action) { http_response_code(400); die("Action not specified."); }
 
-    $admin_actions = ['add_category', 'delete_category', 'edit_category', 'add_product', 'delete_product', 'edit_product', 'add_coupon', 'delete_coupon', 'update_review_status', 'update_order_status', 'update_hero_banner', 'update_favicon', 'update_currency_rate', 'update_contact_info', 'update_admin_password', 'update_site_logo', 'update_hot_deals', 'update_payment_methods', 'update_smtp_settings', 'send_manual_email'];
+    $admin_actions = ['add_category', 'delete_category', 'edit_category', 'add_product', 'delete_product', 'edit_product', 'add_coupon', 'delete_coupon', 'update_review_status', 'update_order_status', 'update_hero_banner', 'update_favicon', 'update_currency_rate', 'update_contact_info', 'update_admin_password', 'update_site_logo', 'update_hot_deals', 'update_payment_methods', 'update_smtp_settings', 'send_manual_email', 'update_page_content'];
     if (in_array($action, $admin_actions)) {
         if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
             http_response_code(403); die("Forbidden: You must be logged in.");
@@ -290,6 +290,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $contact_info = ['phone' => htmlspecialchars(trim($_POST['phone_number'])), 'whatsapp' => htmlspecialchars(trim($_POST['whatsapp_number'])), 'email' => htmlspecialchars(trim($_POST['email_address']))];
             update_setting($pdo, 'contact_info', $contact_info);
             $redirect_url = 'admin.php?view=settings';
+            break;
+        case 'update_page_content':
+            if (isset($_POST['page_content']) && is_array($_POST['page_content'])) {
+                foreach ($_POST['page_content'] as $key => $content) {
+                    $db_key = "page_content_" . $key;
+                    update_setting($pdo, $db_key, $content);
+                }
+            }
+            $redirect_url = 'admin.php?view=pages';
             break;
     }
     header('Location: ' . $redirect_url);
